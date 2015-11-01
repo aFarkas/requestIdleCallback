@@ -34,7 +34,7 @@ requestIdleCallback(function(deadline){
 });
 ```
 
-**Reading vs writing layout:** `requestIdleCallback` is mainly for layout neutral or layout reads/measurements. In case you want to write layout/manipulate the DOM consider using `requestAnimationFrame` instead.
+**Reading vs writing layout:** `requestIdleCallback` is mainly for layout neutral or layout reading/measuring tasks. In case you want to write layout/manipulate the DOM consider using `requestAnimationFrame` instead.
 
 But `requestIdleCallback` can also be combined with `requestAnimationFrame`:
 
