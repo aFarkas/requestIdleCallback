@@ -35,7 +35,7 @@
 		},
 	};
 	var setInacitve = debounce(function(){
-		remainingTime = 25;
+		remainingTime = 22;
 		throttle = 66;
 		minThrottle = 0;
 	});
@@ -120,13 +120,18 @@
 
 	function runTasks(){
 		var task, i, len;
+		var timeThreshold = remainingTime > 9 ?
+			9 :
+			1
+		;
+
 		taskStart = Date.now();
 		isRunning = false;
 
 		lazytimer = null;
 
 		if(runAttempts > 9 || taskStart - throttleDelay - 51 < scheduleStart){
-			for(i = 0, len = tasks.length; i < len && IdleDeadline.timeRemaining(); i++){
+			for(i = 0, len = tasks.length; i < len && IdleDeadline.timeRemaining() > timeThreshold; i++){
 				task = tasks.shift();
 				tasklength++;
 				if(task){
