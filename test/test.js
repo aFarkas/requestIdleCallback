@@ -2,7 +2,6 @@ suite('idleCallbackShim', function() {
 	test('should have api methods', function(){
 		chai.assert(idleCallbackShim.request);
 		chai.assert(idleCallbackShim.cancel);
-		chai.assert(idleCallbackShim.cfg);
 	});
 
 	test('should invoke callback async', function(done){

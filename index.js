@@ -8,18 +8,20 @@
 	}
 }(function(){
 	'use strict';
-	var scheduleStart, throttleDelay;
+	var scheduleStart, throttleDelay, lazytimer, lazyraf;
 	var root = typeof window != 'undefined' ?
 		window :
 		typeof global != undefined ?
 			global :
 			this || {};
-	var requestAnimationFrame = root.requestAnimationFrame || setTimeout;
+	var requestAnimationFrame = root.cancelRequestAnimationFrame && root.requestAnimationFrame || setTimeout;
+	var cancelRequestAnimationFrame = root.cancelRequestAnimationFrame || clearTimeout;
 	var tasks = [];
-	var runAttemptes = 0;
+	var runAttempts = 0;
 	var isRunning = false;
-	var remainingTime = 6;
-	var throttle = 66;
+	var remainingTime = 25;
+	var minThrottle = 0;
+	var throttle = 0;
 	var index = 0;
 	var taskStart = 0;
 	var tasklength = 0;
@@ -32,12 +34,66 @@
 			return timeRemaining < 0 ? 0 : timeRemaining;
 		},
 	};
+	var setInacitve = debounce(function(){
+		remainingTime = 25;
+		throttle = 0;
+		minThrottle = 0;
+	});
+
+	function debounce(fn){
+		var id, timestamp;
+		var wait = 99;
+		var check = function(){
+			var last = (Date.now()) - timestamp;
+
+			if (last < wait) {
+				id = setTimeout(check, wait - last);
+			} else {
+				id = null;
+				fn();
+			}
+		};
+		return function(){
+			timestamp = Date.now();
+			if(!id){
+				id = setTimeout(check, wait);
+			}
+		};
+	}
+
+	function abortRunning(){
+		if(isRunning){
+			if(lazyraf){
+				cancelRequestAnimationFrame(lazyraf);
+			}
+			if(lazytimer){
+				clearTimeout(lazytimer);
+			}
+			isRunning = false;
+		}
+	}
+
+	function onInputorMutation(){
+		if(throttle != 125){
+			remainingTime = 7;
+			throttle = 125;
+			minThrottle = 35;
+
+			if(isRunning) {
+				abortRunning();
+				scheduleLazy();
+			}
+		}
+		setInacitve();
+	}
 
 	function scheduleAfterRaf() {
-		setTimeout(runTasks, 0);
+		lazyraf = null;
+		lazytimer = setTimeout(runTasks, 0);
 	}
 
 	function scheduleRaf(){
+		lazytimer = null;
 		requestAnimationFrame(scheduleAfterRaf);
 	}
 
@@ -50,8 +106,12 @@
 
 		isRunning = true;
 
+		if(minThrottle && throttleDelay < minThrottle){
+			throttleDelay = minThrottle;
+		}
+
 		if(throttleDelay > 0){
-			setTimeout(scheduleRaf, throttleDelay);
+			lazytimer = setTimeout(scheduleRaf, throttleDelay);
 		} else {
 			throttleDelay = 0;
 			scheduleRaf();
@@ -63,7 +123,9 @@
 		taskStart = Date.now();
 		isRunning = false;
 
-		if(runAttemptes > 9 || taskStart - throttleDelay - 51 < scheduleStart){
+		lazytimer = null;
+
+		if(runAttempts > 9 || taskStart - throttleDelay - 51 < scheduleStart){
 			for(i = 0, len = tasks.length; i < len && IdleDeadline.timeRemaining(); i++){
 				task = tasks.shift();
 				tasklength++;
@@ -76,7 +138,7 @@
 		if(tasks.length){
 			scheduleLazy();
 		} else {
-			runAttemptes = 0;
+			runAttempts = 0;
 		}
 	}
 
@@ -97,18 +159,21 @@
 	if(!root.requestIdleCallback || !root.cancelIdleCallback){
 		root.requestIdleCallback = requestIdleCallback;
 		root.cancelIdleCallback = cancelIdleCallback;
+
+		window.addEventListener('scroll', onInputorMutation, true);
+		window.addEventListener('resize', onInputorMutation);
+
+		['focus', 'mouseover', 'click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
+			document.addEventListener(name, onInputorMutation, true);
+		});
+
+		if(window.MutationObserver){
+			new MutationObserver( onInputorMutation ).observe( document.documentElement, {childList: true, subtree: true, attributes: true} );
+		}
 	}
 
 	return {
 		request: requestIdleCallback,
 		cancel: cancelIdleCallback,
-		cfg: function(name, value){
-			if(typeof value != number || value < 1){return;}
-			if(name == 'throttle'){
-				throttle = value;
-			} else if(name == 'remainingTime'){
-				remainingTime = value;
-			}
-		},
 	};
 }));
