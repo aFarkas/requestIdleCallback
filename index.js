@@ -9,6 +9,12 @@
 }(function(){
 	'use strict';
 	var scheduleStart, throttleDelay;
+	var root = typeof window != 'undefined' ?
+		window :
+		typeof global != undefined ?
+			global :
+			this || {};
+	var requestAnimationFrame = root.requestAnimationFrame || setTimeout;
 	var tasks = [];
 	var runAttemptes = 0;
 	var isRunning = false;
@@ -88,9 +94,9 @@
 		}
 	}
 
-	if(!window.requestIdleCallback || !window.cancelIdleCallback){
-		window.requestIdleCallback = requestIdleCallback;
-		window.cancelIdleCallback = cancelIdleCallback;
+	if(!root.requestIdleCallback || !root.cancelIdleCallback){
+		root.requestIdleCallback = requestIdleCallback;
+		root.cancelIdleCallback = cancelIdleCallback;
 	}
 
 	return {
