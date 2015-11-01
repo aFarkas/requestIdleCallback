@@ -1,6 +1,8 @@
 #`requestIdleCallback` polyfill/shim [![Build Status](https://api.travis-ci.org/aFarkas/requestIdleCallback.svg?branch=master)](https://travis-ci.org/aFarkas/requestIdleCallback)
 
-This is a polyfill/shim for the `requestIdleCallback` and `cancelIdleCallback` API. Form more information see the [Cooperative Scheduling of Background Tasks Draft](http://www.w3.org/TR/requestidlecallback/).
+This is a polyfill/shim for the `requestIdleCallback` and `cancelIdleCallback` API. Also fixes early API implementation. 
+
+For more information see the [Cooperative Scheduling of Background Tasks Draft](http://www.w3.org/TR/requestidlecallback/).
 
 ##Installation
 Include the "index.js" in your website and use `requestIdleCallback` and `cancelIdleCallback` according to the specification.

@@ -36,7 +36,7 @@
 	};
 	var setInacitve = debounce(function(){
 		remainingTime = 25;
-		throttle = 33;
+		throttle = 66;
 		minThrottle = 0;
 	});
 
