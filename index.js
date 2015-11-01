@@ -19,9 +19,9 @@
 	var tasks = [];
 	var runAttempts = 0;
 	var isRunning = false;
-	var remainingTime = 25;
-	var minThrottle = 0;
-	var throttle = 0;
+	var remainingTime = 7;
+	var minThrottle = 35;
+	var throttle = 125;
 	var index = 0;
 	var taskStart = 0;
 	var tasklength = 0;
@@ -36,7 +36,7 @@
 	};
 	var setInacitve = debounce(function(){
 		remainingTime = 25;
-		throttle = 0;
+		throttle = 33;
 		minThrottle = 0;
 	});
 
@@ -110,7 +110,7 @@
 			throttleDelay = minThrottle;
 		}
 
-		if(throttleDelay > 0){
+		if(throttleDelay > 9){
 			lazytimer = setTimeout(scheduleRaf, throttleDelay);
 		} else {
 			throttleDelay = 0;
@@ -142,14 +142,14 @@
 		}
 	}
 
-	function requestIdleCallback(task){
+	function requestIdleCallbackShim(task){
 		index++;
 		tasks.push(task);
 		scheduleLazy();
 		return index;
 	}
 
-	function cancelIdleCallback(id){
+	function cancelIdleCallbackShim(id){
 		var index = id - 1 - tasklength;
 		if(tasks[index]){
 			tasks[index] = null;
@@ -157,8 +157,8 @@
 	}
 
 	if(!root.requestIdleCallback || !root.cancelIdleCallback){
-		root.requestIdleCallback = requestIdleCallback;
-		root.cancelIdleCallback = cancelIdleCallback;
+		root.requestIdleCallback = requestIdleCallbackShim;
+		root.cancelIdleCallback = cancelIdleCallbackShim;
 
 		window.addEventListener('scroll', onInputorMutation, true);
 		window.addEventListener('resize', onInputorMutation);
@@ -170,10 +170,35 @@
 		if(window.MutationObserver){
 			new MutationObserver( onInputorMutation ).observe( document.documentElement, {childList: true, subtree: true, attributes: true} );
 		}
+	} else {
+		try{
+			root.requestIdleCallback(function(){}, {timeout: 0});
+		} catch(e){
+			(function(rIC){
+				var timeRemainingProto, timeRemaining;
+				root.requestIdleCallback = function(fn, timeout){
+					if(timeout && typeof timeout.timeout == 'number'){
+						return rIC(fn, timeout.timeout);
+					}
+					return rIC(fn);
+				};
+				if(root.IdleCallbackDeadline && (timeRemainingProto = IdleCallbackDeadline.prototype)){
+					timeRemaining = Object.getOwnPropertyDescriptor(timeRemainingProto, 'timeRemaining');
+					if(!timeRemaining.configurable || !timeRemaining.get){return;}
+					Object.defineProperty(timeRemainingProto, 'timeRemaining', {
+						value:  function(){
+							return timeRemaining.get.call(this);
+						},
+						enumerable: true,
+						configurable: true,
+					});
+				}
+			})(root.requestIdleCallback)
+		}
 	}
 
 	return {
-		request: requestIdleCallback,
-		cancel: cancelIdleCallback,
+		request: requestIdleCallbackShim,
+		cancel: cancelIdleCallbackShim,
 	};
 }));

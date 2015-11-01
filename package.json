@@ -1,6 +1,6 @@
 {
   "name": "requestidlecallback",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A polyfill for the requestIdleCallback.",
   "main": "index.js",
   "filename": "index.js",
