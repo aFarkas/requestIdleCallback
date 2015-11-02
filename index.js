@@ -34,7 +34,7 @@
 			return timeRemaining < 0 ? 0 : timeRemaining;
 		},
 	};
-	var setInacitve = debounce(function(){
+	var setInactive = debounce(function(){
 		remainingTime = 22;
 		throttle = 66;
 		minThrottle = 0;
@@ -84,7 +84,7 @@
 				scheduleLazy();
 			}
 		}
-		setInacitve();
+		setInactive();
 	}
 
 	function scheduleAfterRaf() {
@@ -130,7 +130,7 @@
 
 		lazytimer = null;
 
-		if(runAttempts > 9 || taskStart - throttleDelay - 51 < scheduleStart){
+		if(runAttempts > 2 || taskStart - throttleDelay - 50 < scheduleStart){
 			for(i = 0, len = tasks.length; i < len && IdleDeadline.timeRemaining() > timeThreshold; i++){
 				task = tasks.shift();
 				tasklength++;
@@ -165,15 +165,17 @@
 		root.requestIdleCallback = requestIdleCallbackShim;
 		root.cancelIdleCallback = cancelIdleCallbackShim;
 
-		window.addEventListener('scroll', onInputorMutation, true);
-		window.addEventListener('resize', onInputorMutation);
+		if(root.document && document.addEventListener){
+			root.addEventListener('scroll', onInputorMutation, true);
+			root.addEventListener('resize', onInputorMutation);
 
-		['focus', 'mouseover', 'click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
-			document.addEventListener(name, onInputorMutation, true);
-		});
+			['focus', 'mouseover', 'click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
+				document.addEventListener(name, onInputorMutation, true);
+			});
 
-		if(window.MutationObserver){
-			new MutationObserver( onInputorMutation ).observe( document.documentElement, {childList: true, subtree: true, attributes: true} );
+			if(root.MutationObserver){
+				new MutationObserver( onInputorMutation ).observe( document.documentElement, {childList: true, subtree: true, attributes: true} );
+			}
 		}
 	} else {
 		try{
