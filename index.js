@@ -169,7 +169,9 @@
 			root.addEventListener('scroll', onInputorMutation, {capture: true, passive: true});
 			root.addEventListener('resize', onInputorMutation);
 
-			['focus', 'mouseover', 'click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
+			document.addEventListener('focus', onInputorMutation, true);
+			document.addEventListener('mouseover', onInputorMutation, true);
+			['click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
 				document.addEventListener(name, onInputorMutation, {capture: true, passive: true});
 			});
 
