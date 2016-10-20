@@ -166,7 +166,7 @@
 		root.cancelIdleCallback = cancelIdleCallbackShim;
 
 		if(root.document && document.addEventListener){
-			root.addEventListener('scroll', onInputorMutation, {capture: true, passive: true});
+			root.addEventListener('scroll', onInputorMutation, true);
 			root.addEventListener('resize', onInputorMutation);
 
 			document.addEventListener('focus', onInputorMutation, true);
