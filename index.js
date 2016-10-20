@@ -170,7 +170,7 @@
 			root.addEventListener('resize', onInputorMutation);
 
 			['focus', 'mouseover', 'click', 'keypress', 'touchstart', 'mousedown'].forEach(function(name){
-				document.addEventListener(name, onInputorMutation, true);
+				document.addEventListener(name, onInputorMutation, {capture: true, passive: true});
 			});
 
 			if(root.MutationObserver){
