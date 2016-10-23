@@ -191,7 +191,7 @@
 				};
 				if(root.IdleCallbackDeadline && (timeRemainingProto = IdleCallbackDeadline.prototype)){
 					timeRemaining = Object.getOwnPropertyDescriptor(timeRemainingProto, 'timeRemaining');
-					if(!timeRemaining.configurable || !timeRemaining.get){return;}
+					if(!timeRemaining || !timeRemaining.configurable || !timeRemaining.get){return;}
 					Object.defineProperty(timeRemainingProto, 'timeRemaining', {
 						value:  function(){
 							return timeRemaining.get.call(this);
