@@ -17,7 +17,7 @@ If multiple functions are scheduled with the `requestIdleCallback` shim for the 
 If you have a fast or a non-splittable task:
 
 ```js
-requstIdleCallback(function(){
+requestIdleCallback(function(){
 	//your task
 });
 ```
