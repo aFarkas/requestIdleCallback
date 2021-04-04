@@ -31,7 +31,7 @@
 		},
 		timeRemaining: function(){
 			var timeRemaining = remainingTime - (Date.now() - taskStart);
-			return timeRemaining < 0 ? 0 : timeRemaining;
+			return Math.max(0, timeRemaining)
 		},
 	};
 	var setInactive = debounce(function(){
