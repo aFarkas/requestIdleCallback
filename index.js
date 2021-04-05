@@ -25,15 +25,21 @@
 	var index = 0;
 	var taskStart = 0;
 	var tasklength = 0;
+
+	const getCurrentTime = typeof performance === 'object' && typeof performance.now === 'function'
+	? () => performance.now()
+	: () => Date.now();
+
 	var IdleDeadline = {
 		get didTimeout(){
 			return false;
 		},
 		timeRemaining: function(){
-			var timeRemaining = remainingTime - (Date.now() - taskStart);
+			var timeRemaining = remainingTime - (getCurrentTime() - taskStart);
 			return Math.max(0, timeRemaining)
 		},
 	};
+	
 	var setInactive = debounce(function(){
 		remainingTime = 22;
 		throttle = 66;
@@ -44,7 +50,7 @@
 		var id, timestamp;
 		var wait = 99;
 		var check = function(){
-			var last = (Date.now()) - timestamp;
+			var last = (getCurrentTime()) - timestamp;
 
 			if (last < wait) {
 				id = setTimeout(check, wait - last);
@@ -54,7 +60,7 @@
 			}
 		};
 		return function(){
-			timestamp = Date.now();
+			timestamp = getCurrentTime();
 			if(!id){
 				id = setTimeout(check, wait);
 			}
@@ -100,9 +106,9 @@
 	function scheduleLazy(){
 
 		if(isRunning){return;}
-		throttleDelay = throttle - (Date.now() - taskStart);
+		throttleDelay = throttle - (getCurrentTime() - taskStart);
 
-		scheduleStart = Date.now();
+		scheduleStart = getCurrentTime();
 
 		isRunning = true;
 
@@ -125,7 +131,7 @@
 			1
 		;
 
-		taskStart = Date.now();
+		taskStart = getCurrentTime();
 		isRunning = false;
 
 		lazytimer = null;
